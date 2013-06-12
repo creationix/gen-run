@@ -114,7 +114,7 @@ function readFile(path, encoding) {
 
 run(function* () {
   try {
-    var contents = readFile("/myfile.txt", "utf8");
+    var contents = yield readFile("/myfile.txt", "utf8");
     if (contents) {
       // the file existed and was not empty
     }
