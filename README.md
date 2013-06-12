@@ -3,13 +3,13 @@ gen-run
 
 Generator Async Runner.  Makes it possible to yield and wait for callbacks and thunks.,
 
-Supports both async functions that use node-style callbacks and thunk-returning async functions.
+Supports both async functions that use node-style callbacks and continuable-returning async functions.
 
-## What is a Thunk?
+## What is a Continuable?
 
-A "thunk" is also known as a "continuable" and is simply a function that accepts a node style callback as it's only argument.
+A "continuable" is simply a function that accepts a node style callback as it's only argument.
 
-A simple example is turning the `setTimeout` function to return a thunk instead of accepting a callback.
+A simple example is turning the `setTimeout` function to return a continuable instead of accepting a callback.
 
 ```js
 function sleep(ms) {
@@ -54,7 +54,7 @@ run(function* () {
 
 ## Synchronous Callback Protection
 
-The runner is aware that sometimes callbacks may be called before the thunk function returns and has safeguards internally to prevent stack overflows.
+The runner is aware that sometimes callbacks may be called before the continuable function returns and has safeguards internally to prevent stack overflows.
 
 ```js
 function decrement(n) {
@@ -73,7 +73,7 @@ run(function* () {
 
 ## Multi-Callback Protection
 
-There is also protection from evil thunks that may call the callback multiple times when they should only ever call it once.  Run will simply ignore subsequent calls from the same thunk.
+There is also protection from evil thunks that may call the callback multiple times when they should only ever call it once.  Run will simply ignore subsequent calls from the same continuable.
 
 ```js
 function evil() {
@@ -95,10 +95,10 @@ run(function* () {
 
 ## Error Handling
 
-I assume the callback in the thunk will be of the form `(err, item)` and will return the item as the result of yield or throw `err` into the generator.  This means that you can use async functions as if they were normal sync functions.
+I assume the callback in the continuable will be of the form `(err, item)` and will return the item as the result of yield or throw `err` into the generator.  This means that you can use async functions as if they were normal sync functions.
 
 ```js
-// Wrap fs.readFile as a thunk style function.
+// Wrap fs.readFile as a continuable style function.
 // Also intercept ENOENT errors and instead return undefined for the result
 function readFile(path, encoding) {
   return function (callback) {
@@ -140,12 +140,12 @@ No, gen-run also works with any callback based API using a slightly more explici
 ```js
 run(function* (gen) {
   console.log("Hello");
-  setTimeout(gen(), 1000);
+  yield setTimeout(gen(), 1000);
   console.log("World");
 });
 ```
 
-This alternate API can be mixed and matched with thunk style APIs.  If you yield a function, it will assume it's a thunk and pass in a callback.  If you don't, it's your responsibility to pass in the generated callback manually in the right place.
+This alternate API can be mixed and matched with continuable style APIs.  If you yield a function, it will assume it's a continuable and pass in a callback.  If you don't, it's your responsibility to pass in the generated callback manually in the right place.
 
 If you want to use delegate yield with the explicit style it's up to you to pass the `gen` function to the child generator.
 
@@ -181,6 +181,6 @@ Copyright (c) 2013 Tim Caswell
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+> The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
