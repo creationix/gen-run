@@ -1,0 +1,27 @@
+{
+  "name": "gen-run",
+  "version": "0.1.0",
+  "description": "Generator Async Runner. Makes it possible to yield and wait for callbacks and thunks.",
+  "main": "run.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/creationix/gen-run.git"
+  },
+  "keywords": [
+    "generator",
+    "async",
+    "runner",
+    "thunk",
+    "continuable",
+    "callback"
+  ],
+  "author": "Tim Caswell <tim@creationix.com>",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/creationix/gen-run/issues"
+  }
+}
