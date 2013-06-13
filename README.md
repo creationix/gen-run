@@ -73,7 +73,7 @@ run(function* () {
 
 ## Multi-Callback Protection
 
-There is also protection from evil thunks that may call the callback multiple times when they should only ever call it once.  Run will simply ignore subsequent calls from the same continuable.
+There is also protection from evil functions that may call the callback multiple times when they should only ever call it once.  Run will simply ignore subsequent calls from the same continuable.
 
 ```js
 function evil() {
