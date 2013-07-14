@@ -1,20 +1,31 @@
 module.exports = run;
 
-function run(generator) {
+function run(generator, callback) {
+  if (callback) {
+    return run(function *(gen) {
+      try {
+        callback(null, yield *generator(gen));
+      }
+      catch(err) {
+        callback(err);
+      }
+    });
+  }
+
   // Pass in resume for no-wrap function calls
   var iterator = generator(resume);
   var data = null, yielded = false;
-  
+
   next();
   check();
-  
+
   function next(item) {
     var cont = iterator.next(item).value;
     // Pass in resume to continuables if one was yielded.
     if (typeof cont === "function") cont(resume());
     yielded = true;
   }
-  
+
   function resume() {
     var done = false;
     return function () {
@@ -24,7 +35,7 @@ function run(generator) {
       check();
     };
   }
-  
+
   function check() {
     while (data && yielded) {
       var err = data[0];
@@ -36,5 +47,4 @@ function run(generator) {
       yielded = true;
     }
   }
-
 }
