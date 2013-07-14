@@ -1,36 +1,30 @@
 module.exports = run;
 
 function run(generator, callback) {
+  if (callback) {
+    return run(function *(gen) {
+      try {
+        callback(null, yield *generator(gen));
+      }
+      catch(err) {
+        callback(err);
+      }
+    });
+  }
+
   // Pass in resume for no-wrap function calls
   var iterator = generator(resume);
   var data = null, yielded = false;
-  var next;
-
-  if (callback)
-    next = function next(item) {
-      try {
-        var cont = iterator.next(item);
-        if (cont.done) 
-          callback(null, cont.value);
-        else {
-          if (typeof cont.value === "function") cont.value(resume());
-          yielded = true;
-        }
-      }
-      catch (e) {
-        callback(e, null);
-      }
-    }
-  else
-    next = function next(item) {
-      var cont = iterator.next(item).value;
-      // Pass in resume to continuables if one was yielded.
-      if (typeof cont === "function") cont(resume());
-      yielded = true;
-    }
 
   next();
   check();
+
+  function next(item) {
+    var cont = iterator.next(item).value;
+    // Pass in resume to continuables if one was yielded.
+    if (typeof cont === "function") cont(resume());
+    yielded = true;
+  }
 
   function resume() {
     var done = false;
