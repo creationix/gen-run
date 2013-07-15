@@ -33,6 +33,20 @@ run(function* () {
 });
 ```
 
+If you pass a second parameter to `run()` it will call the function back with the return result of the function. For example,
+
+```js
+run(function *() {
+  console.log("Hello");
+  yield sleep(1000);
+  console.log("World");
+  return "Hello World";
+}, function (err, value) {
+  if (err) console.log("Error encountered: " + err);
+  else console.log(value);
+});
+```
+
 ## Delegating Yield
 
 Since this works by yielding continuables to the run function, delegating yield will also "just work".
