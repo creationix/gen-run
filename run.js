@@ -23,7 +23,7 @@ function run(generator, callback) {
     catch (err) {
       return callback(err);
     }
-    return callback(null, n.value();
+    return callback(null, n.value);
   }
 
   function nextPlain(item) {
