@@ -55,8 +55,7 @@ function* nowrap(gen) {
 function* nowrap_delegating(gen) {
   console.log("Start");
   yield* nowrap_sub(gen, 10);
-  console.log("End");
-
+  testRun("run_with_callback", run_with_callback);
 }
 
 function* nowrap_sub(gen, n) {
@@ -67,6 +66,44 @@ function* nowrap_sub(gen, n) {
   console.log("DONE!");
 }
 
+function *run_with_callback(gen) {
+  console.log("Callback");
+  yield run(function* (gen) {
+    yield sleep(1000);
+    return "Hello"
+  }, function (err, value) {
+    console.log("Callback err: " + err);
+    console.log("Callback value: " + value);
+    gen()(err, value);
+  });
+  testRun("run_with_callback_exception", run_with_callback_exception);
+}
+
+function *run_with_callback_exception(gen) {
+  console.log("Callback err");
+  yield run(function *(gen) {
+    yield sleep(1000);
+    throw new Error("Some error");
+  }, function (err, value) {
+    console.log("Callback err: " + err);
+    console.log("Callback value: " + value);
+    gen()(null, value); // Intentionally suppress the error
+  });
+  testRun("run_with_callback_early_exception", run_with_callback_early_exception);
+}
+
+function *run_with_callback_early_exception(gen) {
+  console.log("Callback err");
+  yield run(function *(gen) {
+    throw new Error("Some error");
+    yield sleep(1000);
+  }, function (err, value) {
+    console.log("Callback err: " + err);
+    console.log("Callback value: " + value);
+    gen()(null, value); // Intentionally suppress the error
+  });
+  console.log("End");
+}
 
 function sleep(ms) {
   return function (callback) {
@@ -88,4 +125,3 @@ function decrement(n) {
     callback(null, n - 1);
   };
 }
-
