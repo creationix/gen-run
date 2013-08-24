@@ -70,7 +70,7 @@ function *run_with_callback(gen) {
   console.log("Callback");
   yield run(function* (gen) {
     yield sleep(1000);
-    return "Hello"
+    return "Hello";
   }, function (err, value) {
     console.log("Callback err: " + err);
     console.log("Callback value: " + value);
@@ -102,7 +102,25 @@ function *run_with_callback_early_exception(gen) {
     console.log("Callback value: " + value);
     gen()(null, value); // Intentionally suppress the error
   });
-  console.log("End");
+  testRun("run_with_thrown_error", run_with_thrown_error);
+}
+
+function *run_with_thrown_error(gen) {
+  var inCatch = false;
+  try {
+    yield sleep(1);
+    yield fail();
+    console.error("this should not happen!");
+  }
+  catch (err) {
+    console.log("in catch: " + err);
+    console.assert(err);
+    inCatch = true;
+  }
+  yield sleep(1);
+  console.log("yielded after catch");
+  console.assert(inCatch);
+  console.log("\nEnd");
 }
 
 function sleep(ms) {
@@ -117,7 +135,13 @@ function evil() {
     setTimeout(function () {
       callback(null, 2);
     }, 100);
-  }
+  };
+}
+
+function fail() {
+  return function (callback) {
+    callback(Error("throwing error into generator"));
+  };
 }
 
 function decrement(n) {
