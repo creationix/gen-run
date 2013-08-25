@@ -68,39 +68,42 @@ function* nowrap_sub(gen, n) {
 
 function *run_with_callback(gen) {
   console.log("Callback");
+  var resume = gen();
   yield run(function* (gen) {
     yield sleep(1000);
     return "Hello";
   }, function (err, value) {
     console.log("Callback err: " + err);
     console.log("Callback value: " + value);
-    gen()(err, value);
+    resume(err, value);
   });
   testRun("run_with_callback_exception", run_with_callback_exception);
 }
 
 function *run_with_callback_exception(gen) {
   console.log("Callback err");
+  var resume = gen();
   yield run(function *(gen) {
     yield sleep(1000);
     throw new Error("Some error");
   }, function (err, value) {
     console.log("Callback err: " + err);
     console.log("Callback value: " + value);
-    gen()(null, value); // Intentionally suppress the error
+    resume(null, value); // Intentionally suppress the error
   });
   testRun("run_with_callback_early_exception", run_with_callback_early_exception);
 }
 
 function *run_with_callback_early_exception(gen) {
   console.log("Callback err");
+  var resume = gen();
   yield run(function *(gen) {
     throw new Error("Some error");
     yield sleep(1000);
   }, function (err, value) {
     console.log("Callback err: " + err);
     console.log("Callback value: " + value);
-    gen()(null, value); // Intentionally suppress the error
+    resume(null, value); // Intentionally suppress the error
   });
   testRun("run_with_thrown_error", run_with_thrown_error);
 }
