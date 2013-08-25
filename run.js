@@ -5,12 +5,17 @@ function run(generator, callback) {
   var iterator = generator(resume);
   var data = null, yielded = false;
 
-  var next = callback ? nextSafe : nextPlain;
-  
+  if (!callback) callback = function (err) {
+    // If the generator ended with an error, throw it globally with setTimeout.
+    // Throwing locally from a callback is not allowed, and swallowing the
+    // error is a bad idea, so there's no better option.
+    if (err) setTimeout(function () { throw err; }, 0);
+  };
+
   next();
   check();
   
-  function nextSafe(err, item) {
+  function next(err, item) {
     var n;
     try {
       n = (err ? iterator.throw(err) : iterator.next(item));
@@ -24,13 +29,6 @@ function run(generator, callback) {
       return callback(err);
     }
     return callback(null, n.value);
-  }
-
-  function nextPlain(err, item) {
-    var cont = (err ? iterator.throw(err) : iterator.next(item)).value;
-    // Pass in resume to continuables if one was yielded.
-    if (typeof cont === "function") cont(resume());
-    yielded = true;
   }
   
   function resume() {
