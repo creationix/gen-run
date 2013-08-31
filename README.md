@@ -159,7 +159,7 @@ run(function* (gen) {
 });
 ```
 
-This alternate API can be mixed and matched with continuable style APIs.  If you yield a function, it will assume it's a continuable and pass in a callback.  If you don't, it's your responsibility to pass in the generated callback manually in the right place.
+This alternate API can be mixed and matched with continuable style APIs.  If you call `gen()`, you still have to yield afterwards, but the actual yielded value will be ignored.  If you don't call `gen()`, you have to yield a continuable function, which will be called by gen-run appropriately.
 
 If you want to use delegate yield with the explicit style it's up to you to pass the `gen` function to the child generator.
 

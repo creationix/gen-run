@@ -1,21 +1,29 @@
 module.exports = run;
 
 function run(generator, callback) {
-  // Pass in resume for no-wrap function calls
-  var iterator = generator(resume);
-  var data = null, yielded = false;
+  // Pass in gen for no-wrap function calls
+  var iterator = generator(gen);
+  var data = null, yielded = false, calledGen = false;
 
-  var next = callback ? nextSafe : nextPlain;
-  
+  if (!callback) callback = function (err) {
+    // If the generator ended with an error, throw it globally with setTimeout.
+    // Throwing locally from a callback is not allowed, and swallowing the
+    // error is a bad idea, so there's no better option.
+    if (err) setTimeout(function () { throw err; }, 0);
+  };
+
   next();
   check();
   
-  function nextSafe(item) {
+  function next(err, item) {
     var n;
     try {
-      n = iterator.next(item);
+      n = (err ? iterator.throw(err) : iterator.next(item));
       if (!n.done) {
-        if (typeof n.value === "function") n.value(resume());
+        if (!calledGen && typeof n.value === "function") n.value(gen());
+        if (!calledGen) {
+          throw Error("generator didn't yield a continuable or call gen()");
+        }
         yielded = true;
         return;
       }
@@ -25,15 +33,11 @@ function run(generator, callback) {
     }
     return callback(null, n.value);
   }
-
-  function nextPlain(item) {
-    var cont = iterator.next(item).value;
-    // Pass in resume to continuables if one was yielded.
-    if (typeof cont === "function") cont(resume());
-    yielded = true;
-  }
   
-  function resume() {
+  function gen() {
+    if (yielded) throw Error("gen() can only be called from the generator");
+    if (calledGen) throw Error("gen() already called");
+    calledGen = true;
     var done = false;
     return function () {
       if (done) return;
@@ -49,9 +53,8 @@ function run(generator, callback) {
       var item = data[1];
       data = null;
       yielded = false;
-      if (err) return iterator.throw(err);
-      next(item);
-      yielded = true;
+      calledGen = false;
+      next(err, item);
     }
   }
 
