@@ -49,7 +49,7 @@ run(function *() {
 
 ## Delegating Yield
 
-Since this works by yielding continuables to the run function, delegating yield will also "just work".
+Since this works by yielding continuables to the run function, delegating yield will also just work.
 
 ```js
 function* sub(n) {
@@ -141,7 +141,7 @@ run(function* () {
 
 ## What about Parallel Work?
 
-Like the other libraries, I feel that doing parallel work it outside the scope of this tiny library.  It will work great with any control-flow library that supports continuables or callbacks.
+Like the other libraries, I feel that doing parallel work is outside the scope of this tiny library.  It will work great with any control-flow library that supports continuables or callbacks.
 
 ## But ES6 isn't everywhere yet.
 
