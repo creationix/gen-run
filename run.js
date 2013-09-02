@@ -1,26 +1,20 @@
 module.exports = run;
 
 function run(generator, callback) {
+  if (!callback) return bind(generator);
   // Pass in resume for no-wrap function calls
   var iterator = generator(resume);
   var data = null, yielded = false;
 
-  if (!callback) callback = function (err) {
-    // If the generator ended with an error, throw it globally with setTimeout.
-    // Throwing locally from a callback is not allowed, and swallowing the
-    // error is a bad idea, so there's no better option.
-    if (err) setTimeout(function () { throw err; }, 0);
-  };
-
   next();
   check();
-  
+
   function next(err, item) {
-    var n;
+    var result;
     try {
-      n = (err ? iterator.throw(err) : iterator.next(item));
-      if (!n.done) {
-        if (typeof n.value === "function") n.value(resume());
+      result = (err ? iterator.throw(err) : iterator.next(item));
+      if (!result.done) {
+        if (typeof result.value === "function") result.value(resume());
         yielded = true;
         return;
       }
@@ -28,9 +22,9 @@ function run(generator, callback) {
     catch (err) {
       return callback(err);
     }
-    return callback(null, n.value);
+    return callback(null, result.value);
   }
-  
+
   function resume() {
     var done = false;
     return function () {
@@ -40,7 +34,7 @@ function run(generator, callback) {
       check();
     };
   }
-  
+
   function check() {
     while (data && yielded) {
       var err = data[0];
@@ -52,4 +46,14 @@ function run(generator, callback) {
     }
   }
 
+}
+
+function bind(generator) {
+  return function (callback) {
+    return run.call(this, generator, callback || throwit);
+  };
+}
+
+function throwit(err) {
+  if (err) throw err;
 }

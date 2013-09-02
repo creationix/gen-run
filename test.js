@@ -2,7 +2,7 @@ var run = require('./.');
 
 function testRun(name, fn) {
   console.log("\nStarting", name);
-  run(fn);
+  process.nextTick(run(fn));
   console.log("Started", name);
 }
 
