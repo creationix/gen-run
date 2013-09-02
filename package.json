@@ -1,6 +1,6 @@
 {
   "name": "gen-run",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generator Async Runner. Makes it possible to yield and wait for callbacks and thunks.",
   "main": "run.js",
   "scripts": {
