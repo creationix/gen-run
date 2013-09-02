@@ -13,14 +13,14 @@ function run(generator, callback) {
   else {
     throw new TypeError("Expected generator or iterator and got " + typeof generator);
   }
-  
+
   var data = null, yielded = false;
 
   var next = callback ? nextSafe : nextPlain;
-  
+
   next();
   check();
-  
+
   function nextSafe(err, item) {
     var n;
     try {
@@ -43,7 +43,7 @@ function run(generator, callback) {
     if (typeof cont === "function") cont(resume());
     yielded = true;
   }
-  
+
   function resume() {
     var done = false;
     return function () {
@@ -53,7 +53,7 @@ function run(generator, callback) {
       check();
     };
   }
-  
+
   function check() {
     while (data && yielded) {
       var err = data[0];
