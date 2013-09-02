@@ -1,8 +1,19 @@
 module.exports = run;
 
 function run(generator, callback) {
-  // Pass in resume for no-wrap function calls
-  var iterator = generator(resume);
+  var iterator;
+  if (typeof generator === "function") {
+    // Pass in resume for no-wrap function calls
+    iterator = generator(resume);
+  }
+  else if (typeof generator === "object") {
+    // Oterwise, assume they gave us the iterator directly.
+    iterator = generator;
+  }
+  else {
+    throw new TypeError("Expected generator or iterator and got " + typeof generator);
+  }
+  
   var data = null, yielded = false;
 
   var next = callback ? nextSafe : nextPlain;
