@@ -10,9 +10,49 @@ testRun("basic", basic);
 
 function* basic() {
   console.log("Hello");
-  yield sleep(1000);
+  yield sleep(100);
   console.log("World");
+  testRun("parallel", parallel);
+}
+
+function* parallel() {
+  console.log("Before");
+  var res = yield [
+    data(1),
+    data(2),
+    data(3),
+    data(4),
+    data(5),
+  ];
+  console.log(res);
+  if (res.length !== 5) throw new Error("Data mismatch");
+  for (var i = 0; i < 5; i++) {
+    if (res[i] !== i + 1) throw new Error("Invalid data");
+  }
+  console.log("After");
+  testRun("parallelNamed", parallelNamed);
+}
+
+function* parallelNamed() {
+  console.log("Before");
+  var res = yield {
+    a: data(1),
+    b: data(2),
+    c: data(3),
+    d: data(4),
+    e: data(5),
+  };
+  console.log(res);
+  console.log("After");
   testRun("delegating", delegating);
+}
+
+function data(n) {
+  return function (callback) {
+    setTimeout(function () {
+      callback(null, n);
+    }, (n % 3) * 100);
+  };
 }
 
 function* delegating() {
@@ -40,14 +80,14 @@ function* sync() {
 function* multi() {
   console.log("Hello");
   yield evil();
-  yield sleep(1000);
+  yield sleep(100);
   console.log("World");
   testRun("nowrap", nowrap);
 }
 
 function* nowrap(gen) {
   console.log("Hello");
-  yield setTimeout(gen(), 1000);
+  yield setTimeout(gen(), 100);
   console.log("World");
   testRun("nowrap_delegating", nowrap_delegating);
 }
@@ -82,7 +122,7 @@ function *run_with_callback(gen) {
 function *run_with_callback_exception(gen) {
   console.log("Callback err");
   yield run(function *(gen) {
-    yield sleep(1000);
+    yield sleep(100);
     throw new Error("Some error");
   }, function (err, value) {
     console.log("Callback err: " + err);
@@ -96,7 +136,7 @@ function *run_with_callback_early_exception(gen) {
   console.log("Callback err");
   yield run(function *(gen) {
     throw new Error("Some error");
-    yield sleep(1000);
+    yield sleep(100);
   }, function (err, value) {
     console.log("Callback err: " + err);
     console.log("Callback value: " + value);

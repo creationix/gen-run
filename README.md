@@ -141,7 +141,11 @@ run(function* () {
 
 ## What about Parallel Work?
 
-Like the other libraries, I feel that doing parallel work is outside the scope of this tiny library.  It will work great with any control-flow library that supports continuables or callbacks.
+Gen-Run has basic built-in support for parallel work via yielding arrays or maps of continuables.
+
+If you yield an array of continuable functions, it will run them all in parallel and return the results.  If there is an error in any of them, the expression will throw.
+
+The same works for objects except the result is an object.  This allows for named data.
 
 ## But ES6 isn't everywhere yet.
 
