@@ -1,7 +1,7 @@
 gen-run
 =======
 
-Generator Async Runner.  Makes it possible to yield and wait for callbacks and [continuables](https://github.com/creationix/js-git/blob/master/specs/continuable.md).
+Generator Async Runner.  Makes it possible to yield and wait for callbacks and [continuables](https://github.com/creationix/js-git#continuables).
 
 Supports both async functions that use node-style callbacks and continuable-returning async functions.
 
