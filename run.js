@@ -2,7 +2,7 @@ module.exports = run;
 
 function run(generator, callback) {
   var iterator;
-  if (typeof generator === "function") {
+  if (generator instanceof Function) {
     // Pass in resume for no-wrap function calls
     iterator = generator(resume);
   }
@@ -45,19 +45,19 @@ function run(generator, callback) {
 
   function start(cont) {
     // Pass in resume to continuables if one was yielded.
-    if (typeof cont === "function") return cont(resume());
+    if (cont instanceof Function) return cont(resume());
     // If an array of continuables is yielded, run in parallel
     if (Array.isArray(cont)) {
       for (var i = 0, l = cont.length; i < l; ++i) {
-        if (typeof cont[i] !== "function") return;
+        if (!(cont[i] instanceof Function)) return;
       }
       return parallel(cont, resume());
     }
     // Also run hash of continuables in parallel, but name results.
-    if (typeof cont === "object" && Object.getPrototypeOf(cont) === Object.prototype) {
+    if (cont instanceof Object) {
       var keys = Object.keys(cont);
       for (var i = 0, l = keys.length; i < l; ++i) {
-        if (typeof cont[keys[i]] !== "function") return;
+        if (!(cont[keys[i]] instanceof Function)) return;
       }
       return parallelNamed(keys, cont, resume());
     }
